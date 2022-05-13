@@ -1,0 +1,18 @@
+rules:
+  - id: circleci-shell-injection
+    severity: ERROR
+    languages:
+      - yaml
+    message:
+      CircleCI Shell Injection
+    patterns:
+      - pattern-inside: "steps: [...]"
+      - pattern-inside: |
+          - run: ...
+            ...
+      - pattern: "command: $SHELL"
+      - metavariable-pattern:
+          language: generic
+          metavariable: $SHELL
+          patterns: 
+            - pattern: ${CIRCLE_BRANCH}

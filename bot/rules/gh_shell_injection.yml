@@ -1,0 +1,74 @@
+rules:
+  - id: gh-shell-injection-high
+    severity: ERROR
+    languages:
+      - yaml
+    message:
+      HIGH SEVERTIY Command Injection, as presence of `env` block enables
+      exfiltration of secrets.
+
+    patterns:
+      - pattern-inside: "steps: [...]"
+      - pattern-inside: |
+          - run: ...
+            ...
+            env: ...
+            ...
+
+      - pattern: "run: $SHELL"
+      - metavariable-pattern:
+          language: generic
+          metavariable: $SHELL
+          patterns:
+            - pattern-either:
+                - pattern: ${{ github.event.issue.title }}
+                - pattern: ${{ github.event.issue.body }}
+                - pattern: ${{ github.event.pull_request.title }}
+                - pattern: ${{ github.event.pull_request.body }}
+                - pattern: ${{ github.event.comment.body }}
+                - pattern: ${{ github.event.review.body }}
+                - pattern: ${{ github.event.review_comment.body }}
+                - pattern: ${{ github.event.pages. ... .page_name}}
+                - pattern: ${{ github.event.head_commit.message }}
+                - pattern: ${{ github.event.head_commit.author.email }}
+                - pattern: ${{ github.event.head_commit.author.name }}
+                - pattern: ${{ github.event.commits ... .author.email }}
+                - pattern: ${{ github.event.commits ... .author.name }}
+
+  - id: gh-shell-injection-mid
+    severity: WARNING
+    languages:
+      - yaml
+    message:
+      MID-SEVERITY Command Injection, as lack of presence of env block and
+      presence of branch-based inputs may not result in exfiltration of secrets.
+    patterns:
+      - pattern-inside: "steps: [...]"
+      - pattern-inside: |
+          - run: ...
+            ...
+      - pattern: "run: $SHELL"
+      - metavariable-pattern:
+          language: generic
+          metavariable: $SHELL
+          patterns:
+            - pattern-either:
+                - pattern: ${{ github.event.issue.title }}
+                - pattern: ${{ github.event.issue.body }}
+                - pattern: ${{ github.event.pull_request.title }}
+                - pattern: ${{ github.event.pull_request.body }}
+                - pattern: ${{ github.event.comment.body }}
+                - pattern: ${{ github.event.review.body }}
+                - pattern: ${{ github.event.review_comment.body }}
+                - pattern: ${{ github.event.pages. ... .page_name}}
+                - pattern: ${{ github.event.head_commit.message }}
+                - pattern: ${{ github.event.head_commit.author.email }}
+                - pattern: ${{ github.event.head_commit.author.name }}
+                - pattern: ${{ github.event.commits ... .author.email }}
+                - pattern: ${{ github.event.commits ... .author.name }}
+
+                # not the best places for injection...
+                - pattern: ${{ github.event.pull_request.head.ref }}
+                - pattern: ${{ github.event.pull_request.head.label }}
+                - pattern: ${{ github.event.pull_request.head.repo.default_branch }}
+                - pattern: ${{ github.head_ref }}

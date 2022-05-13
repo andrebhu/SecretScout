@@ -1,0 +1,19 @@
+rules:
+  - id: azure-shell-injection
+    severity: ERROR
+    languages:
+      - yaml
+    message:
+      Azure Pipelines Shell Injection
+    patterns:
+      - pattern-inside: "steps: [...]"
+      - pattern-inside: |
+          - script: ...
+            ...
+      - pattern: "script: $SHELL"
+      - metavariable-pattern:
+          language: generic
+          metavariable: $SHELL
+          patterns: 
+            - pattern: $(System.PullRequest.SourceBranch)
+

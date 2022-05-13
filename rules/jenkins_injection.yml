@@ -1,0 +1,9 @@
+rules:
+  - id: jenkins-shell-injection
+    severity: ERROR
+    languages:
+      - generic
+    message:
+      Jenkins Groovy Shell Injection
+    patterns:
+      - pattern: sh("")
